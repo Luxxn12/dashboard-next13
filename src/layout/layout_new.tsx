@@ -1,154 +1,199 @@
-import { useState } from 'react';
-import { Navbar, SegmentedControl, Text, createStyles, getStylesRef, rem } from '@mantine/core';
+import { PropsWithChildren, useState } from "react";
 import {
-  IconShoppingCart,
-  IconLicense,
-  IconMessage2,
+  createStyles,
+  Navbar,
+  Group,
+  Code,
+  getStylesRef,
+  rem,
+  AppShell,
+  useMantineTheme,
+  Header,
+  MediaQuery,
+  Burger,
+  Text,
+} from "@mantine/core";
+import {
   IconBellRinging,
-  IconMessages,
   IconFingerprint,
   IconKey,
   IconSettings,
   Icon2fa,
-  IconUsers,
-  IconFileAnalytics,
   IconDatabaseImport,
   IconReceipt2,
-  IconReceiptRefund,
-  IconLogout,
   IconSwitchHorizontal,
-} from '@tabler/icons-react';
+  IconLogout,
+} from "@tabler/icons-react";
+import { LuLayoutDashboard } from "react-icons/lu";
+import { HiOutlineBriefcase } from "react-icons/hi";
+import { FcTwoSmartphones } from "react-icons/fc";
 
 const useStyles = createStyles((theme) => ({
-  navbar: {
-    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
+  header: {
+    paddingBottom: theme.spacing.md,
+    marginBottom: `calc(${theme.spacing.md} * 1.5)`,
+    borderBottom: `${rem(1)} solid ${
+      theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[2]
+    }`,
   },
 
-  title: {
-    textTransform: 'uppercase',
-    letterSpacing: rem(-0.25),
+  footer: {
+    paddingTop: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    borderTop: `${rem(1)} solid ${
+      theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[2]
+    }`,
   },
 
   link: {
     ...theme.fn.focusStyles(),
-    display: 'flex',
-    alignItems: 'center',
-    textDecoration: 'none',
+    display: "flex",
+    alignItems: "center",
+    textDecoration: "none",
     fontSize: theme.fontSizes.sm,
-    color: theme.colorScheme === 'dark' ? theme.colors.dark[1] : theme.colors.gray[7],
+    color:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[1]
+        : theme.colors.gray[7],
     padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
     borderRadius: theme.radius.sm,
     fontWeight: 500,
 
-    '&:hover': {
-      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-      color: theme.colorScheme === 'dark' ? theme.white : theme.black,
+    "&:hover": {
+      backgroundColor:
+        theme.colorScheme === "dark"
+          ? theme.colors.dark[6]
+          : theme.colors.gray[0],
+      color: theme.colorScheme === "dark" ? theme.white : theme.black,
 
-      [`& .${getStylesRef('icon')}`]: {
-        color: theme.colorScheme === 'dark' ? theme.white : theme.black,
+      [`& .${getStylesRef("icon")}`]: {
+        color: theme.colorScheme === "dark" ? theme.white : theme.black,
       },
     },
   },
 
   linkIcon: {
-    ref: getStylesRef('icon'),
-    color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
+    ref: getStylesRef("icon"),
+    color:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[2]
+        : theme.colors.gray[6],
     marginRight: theme.spacing.sm,
   },
 
   linkActive: {
-    '&, &:hover': {
-      backgroundColor: theme.fn.variant({ variant: 'light', color: theme.primaryColor }).background,
-      color: theme.fn.variant({ variant: 'light', color: theme.primaryColor }).color,
-      [`& .${getStylesRef('icon')}`]: {
-        color: theme.fn.variant({ variant: 'light', color: theme.primaryColor }).color,
+    "&, &:hover": {
+      backgroundColor: theme.fn.variant({
+        variant: "light",
+        color: theme.primaryColor,
+      }).background,
+      color: theme.fn.variant({ variant: "light", color: theme.primaryColor })
+        .color,
+      [`& .${getStylesRef("icon")}`]: {
+        color: theme.fn.variant({ variant: "light", color: theme.primaryColor })
+          .color,
       },
     },
   },
-
-  footer: {
-    borderTop: `${rem(1)} solid ${
-      theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
-    }`,
-    paddingTop: theme.spacing.md,
-  },
 }));
 
-const tabs = {
-  account: [
-    { link: '/dashboard', label: 'Notifications', icon: IconBellRinging },
-    { link: '', label: 'Billing', icon: IconReceipt2 },
-    { link: '', label: 'Security', icon: IconFingerprint },
-    { link: '', label: 'SSH Keys', icon: IconKey },
-    { link: '', label: 'Databases', icon: IconDatabaseImport },
-    { link: '', label: 'Authentication', icon: Icon2fa },
-    { link: '', label: 'Other Settings', icon: IconSettings },
-  ],
-  general: [
-    { link: '', label: 'Orders', icon: IconShoppingCart },
-    { link: '', label: 'Receipts', icon: IconLicense },
-    { link: '', label: 'Reviews', icon: IconMessage2 },
-    { link: '', label: 'Messages', icon: IconMessages },
-    { link: '', label: 'Customers', icon: IconUsers },
-    { link: '', label: 'Refunds', icon: IconReceiptRefund },
-    { link: '', label: 'Files', icon: IconFileAnalytics },
-  ],
-};
+const data = [
+  { link: "/dashboard", label: "Dashboard", icon: LuLayoutDashboard },
+  {
+    link: "/dashboard/data_keuangan",
+    label: "Data Keuangan",
+    icon: HiOutlineBriefcase,
+  },
+];
 
-export function Demo() {
+export default function DashboardLayout({ children }: PropsWithChildren) {
   const { classes, cx } = useStyles();
-  const [section, setSection] = useState<'account' | 'general'>('account');
-  const [active, setActive] = useState('Billing');
+  const [active, setActive] = useState("Billing");
+  const theme = useMantineTheme();
+  const [opened, setOpened] = useState(false);
 
-  const links = tabs[section].map((item) => (
+  const links = data.map((item) => (
     <a
-      className={cx(classes.link, { [classes.linkActive]: item.label === active })}
+      className={cx(classes.link, {
+        [classes.linkActive]: item.label === active,
+      })}
       href={item.link}
       key={item.label}
-      onClick={(event) => {
-        event.preventDefault();
+      onClick={() => {
         setActive(item.label);
       }}
     >
-      <item.icon className={classes.linkIcon} stroke={1.5} />
+      <item.icon className={classes.linkIcon} size={20} />
       <span>{item.label}</span>
     </a>
   ));
 
   return (
-    <Navbar height={840} width={{ sm: 300 }} p="md" className={classes.navbar}>
-      <Navbar.Section>
-        <Text weight={500} size="sm" className={classes.title} color="dimmed" mb="xs">
-          bgluesticker@mantine.dev
-        </Text>
+    <AppShell
+      styles={{
+        main: {
+          background:
+            theme.colorScheme === "dark"
+              ? theme.colors.dark[8]
+              : theme.colors.gray[0],
+        },
+      }}
+      navbarOffsetBreakpoint="sm"
+      asideOffsetBreakpoint="sm"
+      navbar={
+        <Navbar
+          p="md"
+          hiddenBreakpoint="sm"
+          hidden={!opened}
+          width={{ sm: 200, lg: 300 }}
+          height={"100vh"}
+          bg={"#533393"}
+        >
+          <Navbar.Section grow>
+            <Group className={classes.header} position="apart">
+              <Code sx={{ fontWeight: 700 }}>v3.1.2</Code>
+            </Group>
+            {links}
+          </Navbar.Section>
 
-        <SegmentedControl
-          value={section}
-          onChange={(value: 'account' | 'general') => setSection(value)}
-          transitionTimingFunction="ease"
-          fullWidth
-          data={[
-            { label: 'Account', value: 'account' },
-            { label: 'System', value: 'general' },
-          ]}
-        />
-      </Navbar.Section>
+          <Navbar.Section className={classes.footer}>
+            <a href="#" className={classes.link}>
+              <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
+              <span>Change account</span>
+            </a>
 
-      <Navbar.Section grow mt="xl">
-        {links}
-      </Navbar.Section>
-
-      <Navbar.Section className={classes.footer}>
-        <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
-          <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
-          <span>Change account</span>
-        </a>
-
-        <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
-          <IconLogout className={classes.linkIcon} stroke={1.5} />
-          <span>Logout</span>
-        </a>
-      </Navbar.Section>
-    </Navbar>
+            <a href="#" className={classes.link}>
+              <IconLogout className={classes.linkIcon} stroke={1.5} />
+              <span>Logout</span>
+            </a>
+          </Navbar.Section>
+        </Navbar>
+      }
+      header={
+        <Header height={{ base: 50, md: 70 }} p="md" bg={"#0C134F"}>
+          <div
+            style={{ display: "flex", alignItems: "center", height: "100%" }}
+          >
+            <MediaQuery largerThan="sm" styles={{ display: "none" }}>
+              <Burger
+                opened={opened}
+                onClick={() => setOpened((o) => !o)}
+                size="md"
+                color={theme.colors.gray[1]}
+                mr="xl"
+              />
+            </MediaQuery>
+            <Group>
+              <FcTwoSmartphones size={40} />
+              <Text fw={700} fz={30} color="white">
+                BIP
+              </Text>
+            </Group>
+          </div>
+        </Header>
+      }
+    >
+      {children}
+    </AppShell>
   );
 }
