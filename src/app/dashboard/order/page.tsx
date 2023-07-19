@@ -1,11 +1,11 @@
 "use client"
-import  Demo  from '@/layout/layout_new';
+import AppOrder from '@/components/app_order';
 import React from 'react';
 
 function Page() {
   return (
     <>
-    <Demo/>
+    <AppOrder/>
     </>
   );
 }

@@ -1,28 +1,150 @@
 import { PropsWithChildren, useState } from "react";
 import {
-  AppShell,
+  createStyles,
   Navbar,
+  Group,
+  Code,
+  getStylesRef,
+  rem,
+  AppShell,
+  useMantineTheme,
   Header,
-  Text,
   MediaQuery,
   Burger,
-  useMantineTheme,
-  Group,
+  Text,
 } from "@mantine/core";
-import { FcBriefcase, FcBullish, FcTwoSmartphones } from "react-icons/fc";
+import {
+  IconBellRinging,
+  IconFingerprint,
+  IconKey,
+  IconSettings,
+  Icon2fa,
+  IconDatabaseImport,
+  IconReceipt2,
+  IconSwitchHorizontal,
+  IconLogout,
+} from "@tabler/icons-react";
+import { LuLayoutDashboard } from "react-icons/lu";
+import { HiOutlineBriefcase, HiOutlineShoppingCart } from "react-icons/hi";
+import { FcTwoSmartphones } from "react-icons/fc";
+import { AiOutlineShoppingCart } from "react-icons/ai";
+import BgColor from "@/fun/color";
+
+const useStyles = createStyles((theme) => ({
+  header: {
+    paddingBottom: theme.spacing.md,
+    marginBottom: `calc(${theme.spacing.md} * 1.5)`,
+    borderBottom: `${rem(1)} solid ${
+      theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[2]
+    }`,
+  },
+
+  footer: {
+    paddingTop: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    borderTop: `${rem(1)} solid ${
+      theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[2]
+    }`,
+  },
+
+  link: {
+    ...theme.fn.focusStyles(),
+    display: "flex",
+    alignItems: "center",
+    textDecoration: "none",
+    fontSize: theme.fontSizes.sm,
+    color:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[1]
+        : theme.colors.gray[7],
+    padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
+    borderRadius: theme.radius.sm,
+    fontWeight: 500,
+
+    "&:hover": {
+      backgroundColor:
+        theme.colorScheme === "dark"
+          ? theme.colors.dark[6]
+          : theme.colors.gray[0],
+      color: theme.colorScheme === "dark" ? theme.white : theme.black,
+
+      [`& .${getStylesRef("icon")}`]: {
+        color: theme.colorScheme === "dark" ? theme.white : theme.black,
+      },
+    },
+  },
+
+  linkIcon: {
+    ref: getStylesRef("icon"),
+    color:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[2]
+        : theme.colors.gray[6],
+    marginRight: theme.spacing.sm,
+  },
+
+  linkActive: {
+    "&, &:hover": {
+      backgroundColor: theme.fn.variant({
+        variant: "light",
+        color: theme.primaryColor,
+      }).background,
+      color: theme.fn.variant({ variant: "light", color: theme.primaryColor })
+        .color,
+      [`& .${getStylesRef("icon")}`]: {
+        color: theme.fn.variant({ variant: "light", color: theme.primaryColor })
+          .color,
+      },
+    },
+  },
+}));
+
+const data = [
+  { link: "/dashboard", label: "Dashboard", icon: LuLayoutDashboard },
+  {
+    link: "/dashboard/order",
+    label: "Order",
+    icon: HiOutlineShoppingCart,
+  },
+  {
+    link: "/dashboard/data_keuangan",
+    label: "Data Keuangan",
+    icon: HiOutlineBriefcase,
+  },
+
+];
 
 export default function DashboardLayout({ children }: PropsWithChildren) {
+  const { classes, cx } = useStyles();
+  const [active, setActive] = useState('');
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
+
+  const links = data.map((item) => (
+    <a
+      className={cx(classes.link, {
+        [classes.linkActive]: item.label === active,
+      })}
+      href={item.link}
+      key={item.label}
+      onClick={(event) => {
+        // event.currentTarget.target();
+        setActive(item.label);
+      }}
+    >
+      <item.icon className={classes.linkIcon} size={20} />
+      <span>{item.label}</span>
+    </a>
+  ));
 
   return (
     <AppShell
       styles={{
         main: {
-          background:
-            theme.colorScheme === "dark"
-              ? theme.colors.dark[8]
-              : theme.colors.gray[0],
+          background: "radial-gradient(circle, rgba(67,4,120,1) 18%, rgba(65,4,117,1) 26%, rgba(59,4,107,1) 34%, rgba(0,0,0,1) 94%)"
+            // theme.colorScheme === "dark"
+            //   ? theme.colors.dark[8]
+            //   : theme.colors.dark[9],
         },
       }}
       navbarOffsetBreakpoint="sm"
@@ -33,33 +155,25 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
           hiddenBreakpoint="sm"
           hidden={!opened}
           width={{ sm: 200, lg: 300 }}
-          height={"100vh"}
-          bg={"#533393"}
+          // height={"100vh"}
+          bg={"white"}
         >
-          <Navbar.Section grow>
-            <a 
-              href="/dashboard"
-              style={{ textDecoration: "none", color: "black" }}
-            >
-              <Group mt={20}>
-                <FcBriefcase size={20} />
-                <Text color="white">Dashboard</Text>
-              </Group>
-            </a>
-            <a
-              href="/dashboard/data_keuangan"
-              style={{ textDecoration: "none", color: "black" }}
-            >
-              <Group mt={20}>
-                <FcBullish size={20} />
-                <Text color="white">Data Keuangan</Text>
-              </Group>
+          <Navbar.Section grow>{links}</Navbar.Section>
+
+          <Navbar.Section className={classes.footer}>
+            <a href="/" className={classes.link}>
+              <IconLogout className={classes.linkIcon} stroke={1.5} />
+              <span onClick={() => {
+                // localStorage.removeItem("username")
+              }}>Logout</span>
             </a>
           </Navbar.Section>
         </Navbar>
       }
       header={
-        <Header height={{ base: 50, md: 70 }} p="md" bg={"#0C134F"}>
+        <Header height={{ base: 50, md: 70 }} p="md" style={{
+          background: "radial-gradient(circle, rgba(67,4,120,1) 18%, rgba(65,4,117,1) 26%, rgba(59,4,107,1) 34%, rgba(0,0,0,1) 94%)"
+        }}>
           <div
             style={{ display: "flex", alignItems: "center", height: "100%" }}
           >
@@ -73,8 +187,9 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
               />
             </MediaQuery>
             <Group>
-            <FcTwoSmartphones size={40} />
-              <Text fw={700} fz={30} color="white">BIP</Text>
+              <Text component="a" href="/" fw={700} fz={30} color="white">
+                BIP
+              </Text>
             </Group>
           </div>
         </Header>
