@@ -25,8 +25,10 @@ import {
   IconLogout,
 } from "@tabler/icons-react";
 import { LuLayoutDashboard } from "react-icons/lu";
-import { HiOutlineBriefcase } from "react-icons/hi";
+import { HiOutlineBriefcase, HiOutlineShoppingCart } from "react-icons/hi";
 import { FcTwoSmartphones } from "react-icons/fc";
+import { AiOutlineShoppingCart } from "react-icons/ai";
+import BgColor from "@/fun/color";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -100,6 +102,11 @@ const useStyles = createStyles((theme) => ({
 const data = [
   { link: "/dashboard", label: "Dashboard", icon: LuLayoutDashboard },
   {
+    link: "/dashboard/order",
+    label: "Order",
+    icon: HiOutlineShoppingCart,
+  },
+  {
     link: "/dashboard/data_keuangan",
     label: "Data Keuangan",
     icon: HiOutlineBriefcase,
@@ -109,7 +116,7 @@ const data = [
 
 export default function DashboardLayout({ children }: PropsWithChildren) {
   const { classes, cx } = useStyles();
-  const [active, setActive] = useState('Dashboard');
+  const [active, setActive] = useState('');
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
 
@@ -134,10 +141,10 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
     <AppShell
       styles={{
         main: {
-          background:
-            theme.colorScheme === "dark"
-              ? theme.colors.dark[8]
-              : theme.colors.gray[0],
+          background: "radial-gradient(circle, rgba(67,4,120,1) 18%, rgba(65,4,117,1) 26%, rgba(59,4,107,1) 34%, rgba(0,0,0,1) 94%)"
+            // theme.colorScheme === "dark"
+            //   ? theme.colors.dark[8]
+            //   : theme.colors.dark[9],
         },
       }}
       navbarOffsetBreakpoint="sm"
@@ -149,25 +156,24 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
           hidden={!opened}
           width={{ sm: 200, lg: 300 }}
           // height={"100vh"}
-          bg={"#C1D0B5"}
+          bg={"white"}
         >
           <Navbar.Section grow>{links}</Navbar.Section>
 
           <Navbar.Section className={classes.footer}>
-            <a href="#" className={classes.link}>
-              <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
-              <span>Change account</span>
-            </a>
-
-            <a href="#" className={classes.link}>
+            <a href="/" className={classes.link}>
               <IconLogout className={classes.linkIcon} stroke={1.5} />
-              <span>Logout</span>
+              <span onClick={() => {
+                // localStorage.removeItem("username")
+              }}>Logout</span>
             </a>
           </Navbar.Section>
         </Navbar>
       }
       header={
-        <Header height={{ base: 50, md: 70 }} p="md" bg={"#83764F"}>
+        <Header height={{ base: 50, md: 70 }} p="md" style={{
+          background: "radial-gradient(circle, rgba(67,4,120,1) 18%, rgba(65,4,117,1) 26%, rgba(59,4,107,1) 34%, rgba(0,0,0,1) 94%)"
+        }}>
           <div
             style={{ display: "flex", alignItems: "center", height: "100%" }}
           >
@@ -181,8 +187,7 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
               />
             </MediaQuery>
             <Group>
-              <FcTwoSmartphones size={40} />
-              <Text fw={700} fz={30} color="white">
+              <Text component="a" href="/" fw={700} fz={30} color="white">
                 BIP
               </Text>
             </Group>

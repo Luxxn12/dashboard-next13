@@ -35,19 +35,19 @@ function Sales() {
       xAxis: { type: "category" },
       yAxis: {},
 
-      series: [{ type: "bar" }, { type: "bar" }],
+      series: [{ type: 'bar', color: "#430478" }, { type: 'bar', color: "black" }],
     };
     setOptions(option);
   };
 
   return (
     <>
-      <Box>
-        <Paper shadow="xl" withBorder radius={"md"} pt={20}>
-          <Text fw={700} fz={30} pl={30}>
+      <Box pt={5}>
+        <Paper shadow="xl" withBorder radius={"md"} >
+          <Text fw={700} fz={30} pl={30} pt={20}>
             Sales
           </Text>
-          <EChartsReact style={{ height: 300 }} option={options} />
+          <EChartsReact style={{ height: 376 }} option={options} />
         </Paper>
       </Box>
     </>

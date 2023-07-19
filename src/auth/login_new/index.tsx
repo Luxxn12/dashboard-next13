@@ -17,13 +17,54 @@ import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FiLock } from "react-icons/fi";
 import { AiOutlineGithub, AiOutlineMail } from "react-icons/ai";
+import BgColor from "@/fun/color";
+import { useForm } from "@mantine/form"
+import Swal, {} from "sweetalert2"
+import { api } from "@/lib/api-backend";
+import toast from 'react-simple-toasts';
+import 'react-simple-toasts/dist/theme/light.css';
+import { useRouter } from "next/navigation";
 
 function LoginNew() {
+  const router = useRouter()
+
+  const formLogin = useForm({
+    initialValues: {
+      data: {
+        email: "",
+        password: ""
+      }
+    }
+  })
+
+  const ApiLogin = async () => {
+    console.log(formLogin.values.data)
+    if(Object.values(formLogin.values.data).includes("")) {
+      return toast('Lengkapi Data Form', { theme: 'light' })
+    }
+
+    fetch('/api/auth/login', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formLogin.values.data)
+    }).then(async (res) => {
+      if (res.status === 200) {
+        const data = await res.json()
+        localStorage.setItem("user_id", data.id)
+        toast("Sukses", {theme: "light"})
+        router.push("/dashboard")
+      } else {
+        toast("Email atau Password salah", {theme: "light"})
+      }
+    })
+  }
+
   return (
     <Layout>
       <Box
         sx={{
-          backgroundColor: "#468B97",
           height: "100vh",
         }}
       >
@@ -44,13 +85,15 @@ function LoginNew() {
                 icon={<AiOutlineMail size={15} />}
                 placeholder="Email"
                 radius={"md"}
+                {...formLogin.getInputProps("data.email")}
               />
               <PasswordInput
                 icon={<FiLock size={15} />}
                 placeholder="Password"
                 radius={"md"}
+                {...formLogin.getInputProps("data.password")}
               />
-              <Button color="cyan.9" radius={"md"}>
+              <Button color="violet.9" bg={BgColor.ungu} radius={"md"} onClick={ApiLogin}>
                 Login
               </Button>
             </Stack>
